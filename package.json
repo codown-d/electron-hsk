@@ -24,6 +24,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
+    "ahooks": "^3.8.0",
     "antd": "^5.19.0",
     "axios": "^1.7.2",
     "electron-updater": "^6.1.7",
