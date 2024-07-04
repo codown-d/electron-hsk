@@ -80,34 +80,17 @@ const axiosRequest = (option: HttpOption) => {
 // 核心基础请求封装
 export const baseRequest = (url: string, data: any, method = 'post') => {
   return new Promise(async (resolve, reject) => {
-    const option = await baseOptions(
-      {
-        url,
-        data
-      },
-      method
-    )
-    if (import.meta.env.VITE_CURRENT_RUN_MODE === 'main') {
-      netRequest(option)
-        .then((res) => {
-          resolve(res)
-        })
-        .catch((err) => {
-          responseErrorHandle(err)
-          reject(err)
-        })
-    } else {
-      axiosRequest(option)
-        .then((res) => {
-          console.log(res)
-          resolve(res)
-        })
-        .catch((err) => {
-          console.log(err)
-          responseErrorHandle(err)
-          reject(err)
-        })
-    }
+    const option = await baseOptions({ url, data }, method)
+    const isRunMode = import.meta.env.VITE_CURRENT_RUN_MODE === 'main'
+    let fn = isRunMode ? netRequest : axiosRequest
+    fn(option)
+      .then((res) => {
+        resolve(res)
+      })
+      .catch((err) => {
+        responseErrorHandle(err)
+        reject(err)
+      })
   })
 }
 

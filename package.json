@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
+  "type": "module",
   "author": "example.com",
   "homepage": "https://electron-vite.org",
   "scripts": {
@@ -23,10 +24,11 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
-    "@types/axios": "^0.14.0",
     "antd": "^5.19.0",
     "axios": "^1.7.2",
     "electron-updater": "^6.1.7",
+    "loadsh": "^0.0.4",
+    "lowdb": "^7.0.1",
     "react-router-dom": "^6.24.0"
   },
   "devDependencies": {

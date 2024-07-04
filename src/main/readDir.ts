@@ -4,7 +4,7 @@ const path = require('path')
 
 // 递归遍历文件
 const loadFilesInDir = (dir) => {
-  let fileList = []
+  let fileList: string[] = []
   // 读取目录下全部文件及子目录
   let files = fs.readdirSync(dir)
   for (var i = 0; i < files.length; i++) {
@@ -31,9 +31,9 @@ const readDir = (event, arg) => {
       // 只允许选择文件夹
       properties: ['openDirectory']
     })
-    .then((result) => {
+    .then((result: any) => {
       if (!result.canceled) {
-        result.fileList = loadFilesInDir(result.filePaths[0])
+        result['fileList'] = loadFilesInDir(result.filePaths[0])
       }
       // 将处理结果返回给渲染进程
       event.reply('readDir-reply', result)

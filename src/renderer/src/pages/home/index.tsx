@@ -10,7 +10,7 @@ function Home() {
   const navigate = useNavigate()
 
   const [modal, contextHolder] = Modal.useModal()
-
+  console.log(import.meta.env)
   // 读取目录文件列表
   const readDir = () => {
     // 给主进程发送消息

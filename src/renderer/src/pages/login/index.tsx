@@ -1,22 +1,23 @@
 import { useNavigate } from 'react-router-dom'
-import { Button, Input } from 'antd'
+import { Button, Form, Input } from 'antd'
 import electronLogo from '../../assets/electron.svg'
 import './index.less'
 
 function Login() {
   // 创建路由钩子
   const navigate = useNavigate()
-
+  const [form] = Form.useForm()
   return (
-    <div className="P-login">
-      <img src={electronLogo} alt="" className="logo" />
-      <div className="ipt-con">
-        <Input placeholder="账号" />
-      </div>
-      <div className="ipt-con">
-        <Input.Password placeholder="密码" />
-      </div>
-      <div className="ipt-con">
+    <div className="login-screen">
+      <div className="login-screen-card">
+        <Form form={form}>
+          <Form.Item name="note">
+            <Input placeholder="账号" />
+          </Form.Item>
+          <Form.Item name="note">
+            <Input.Password placeholder="密码" />
+          </Form.Item>
+        </Form>
         <Button
           type="primary"
           block={true}

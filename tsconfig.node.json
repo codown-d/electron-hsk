@@ -1,8 +1,18 @@
 {
-  "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
-  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/**/*"],
-  "compilerOptions": {
-    "composite": true,
-    "types": ["electron-vite/node"]
-  }
+    "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
+    "include": [
+        "src/renderer/src/env.d.ts",
+        "electron.vite.config.*",
+        "src/main/**/*",
+        "src/preload/**/*",
+        "src/lowdb/**/*"
+    ],
+    "compilerOptions": {
+        "composite": true,
+        "allowImportingTsExtensions": true,
+        "noEmit": true,
+        "types": [
+            "electron-vite/node"
+        ]
+    }
 }

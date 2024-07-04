@@ -7,6 +7,9 @@ const api = {
     ipcRenderer.once('readDir-reply', (event, result) => {
       callback(event, result)
     })
+  },
+  readDbData: (key) => {
+    return ipcRenderer.invoke('readDbData', key)
   }
 }
 

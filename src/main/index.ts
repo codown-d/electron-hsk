@@ -1,10 +1,10 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { readDir } from './readDir.js'
-import { getElectronVersion } from './version'
-function createWindow(): void {
+import { initDb } from '../lowdb'
+import { initIpc } from './ipc/index.js'
+function createWindow(): BrowserWindow {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -13,7 +13,7 @@ function createWindow(): void {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false,
       // 禁用同源策略，允许跨域请求
       webSecurity: false,
@@ -38,6 +38,7 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+  return mainWindow
 }
 
 // This method will be called when Electron has finished
@@ -46,19 +47,16 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
-
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
-  createWindow()
-
+  initDb().then(() => {
+    let mainWindow = createWindow()
+    initIpc(mainWindow)
+  })
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -79,5 +77,3 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 // 以上英文注释是Electron官方的main.js注释，意思是通过require()来引入其他代码文件。
 // 但是由于Vite的机制，打包的时候会忽略require()，因此只能通过import方式来引入外部方法。
-ipcMain.on('readDir', readDir)
-ipcMain.handle('getElectronVersion', getElectronVersion)
