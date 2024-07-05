@@ -1,7 +1,6 @@
 const MODE = import.meta.env.MODE || 'production'
-
 export const baseUrls: any = {
-  dev: 'http://localhost:3999',
+  development: '',
   production: 'http://jsonplaceholder.typicode.com'
 }
 

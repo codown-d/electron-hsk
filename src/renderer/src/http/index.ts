@@ -1,5 +1,8 @@
 import axios from 'axios'
 import baseUrl from './baseUrl'
+import { WebResponse } from '@renderer/definitions'
+import { getCurrentLanguage } from '@renderer/utils'
+import { onResult } from '@renderer/components/Message'
 
 interface BaseParams {
   url: string
@@ -16,6 +19,7 @@ interface HttpOption {
 
 // 错误处理/拦截器
 const responseErrorHandle = (error: any) => {
+  onResult(error.response.data)
   if (error.response) {
     const { status } = error.response
     if (status === 401) {
@@ -25,17 +29,19 @@ const responseErrorHandle = (error: any) => {
 
 // 构建基础的请求参数
 const baseOptions = async (params: BaseParams, method = 'post') => {
-  const userData = await gloabReadDbData('user')
+  //   const userData = await gloabReadDbData('user')
+  let userData = { token: null }
   const Authorization = userData ? `Bearer ${userData.token}` : ''
   let { url, data } = params
-  let contentType = 'application/json'
-  contentType = params.contentType || contentType
+  let contentType = params.contentType || 'application/json'
   const option: HttpOption = {
-    url: baseUrl + url,
+    url: `${baseUrl}${url}`,
     data: data,
     method: method,
     headers: {
-      'content-type': contentType,
+      'Content-Type': contentType,
+      Accept: 'application/json',
+      'Accept-Language': getCurrentLanguage(),
       Authorization
     }
   }
@@ -49,23 +55,20 @@ const netRequest = (option: HttpOption) => {
     const request = net.request(option)
     let Data = {}
     request.on('response', (response) => {
-      console.log(`STATUS: ${response.statusCode}`)
-      console.log(`HEADERS: ${JSON.stringify(response.headers)}`)
       response.on('data', (chunk) => {
-        console.log(`BODY: ${chunk}`)
         Data = chunk
       })
       response.on('end', () => {
-        console.log('No more data in response.')
         if (response.statusCode !== 200) {
           reject({
-            response: {
-              status: response.statusCode,
-              data: Data
-            }
+            status: response.statusCode,
+            data: Data
           })
         }
-        resolve(Data)
+        resolve({
+          data: Data,
+          status: response.statusCode
+        })
       })
     })
     request.end()
@@ -74,30 +77,47 @@ const netRequest = (option: HttpOption) => {
 
 // axios请求
 const axiosRequest = (option: HttpOption) => {
-  return axios(option)
+  let newOption = { ...option }
+  if ('get' == newOption.method) {
+    newOption['params'] = newOption['data']
+  }
+  return axios(newOption).then((res) => {
+    if (200 == res.status) {
+      return Promise.resolve(res.data)
+    } else {
+      return Promise.reject(res.data)
+    }
+  })
 }
 
 // 核心基础请求封装
-export const baseRequest = (url: string, data: any, method = 'post') => {
+export const baseRequest = (
+  url: string,
+  data: any,
+  method = 'get',
+  silent = false
+): Promise<WebResponse<any>> => {
   return new Promise(async (resolve, reject) => {
     const option = await baseOptions({ url, data }, method)
-    const isRunMode = import.meta.env.VITE_CURRENT_RUN_MODE === 'main'
-    let fn = isRunMode ? netRequest : axiosRequest
+    const isDev = import.meta.env.MODE === 'development'
+    let fn = isDev ? axiosRequest : netRequest
     fn(option)
-      .then((res) => {
-        resolve(res)
+      .then((res: any) => {
+        resolve(WebResponse.from<any>(res))
+        if (silent) {
+        }
       })
       .catch((err) => {
-        responseErrorHandle(err)
+        if (!silent) {
+          responseErrorHandle(err)
+        }
         reject(err)
       })
   })
 }
-
-export const postRequest = (url: string, data = {}) => {
-  return baseRequest(url, data, 'post')
-}
-
 export const getRequest = (url: string, data = {}) => {
   return baseRequest(url, data, 'get')
+}
+export const postRequest = (url: string, data = {}) => {
+  return baseRequest(url, data, 'post')
 }

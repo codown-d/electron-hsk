@@ -32,3 +32,32 @@ body {
     width: 100%;
     height: 100%;
 }
+.flex-r{
+    display: flex;
+    flex-direction: row;
+}
+.flex-c{
+    display: flex;
+    flex-direction: column;
+}
+.flex-r-c{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-self: center;
+}
+.flex-c-c{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-self: center;
+}
+.border-r8{
+    border-radius: 8px;
+}
+.mr10{
+    margin-right: 10px;
+}
+.ml10{
+    margin-left: 10px;
+}

@@ -16,6 +16,23 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    plugins: [react()]
+    plugins: [react()],
+    server: {
+      port: 3000,
+      proxy: {
+        '/ws/v1': {
+          // target: 'ws://192.168.0.66:60601/',这是后端接口地址
+          target: 'ws://console-local01.tensorsecurity.cn:30043/',
+          changeOrigin: true,
+          ws: true
+        },
+        '/api': {
+          // https://console-test-cn.tensorsecurity.cn/
+          // https://console-local02.tensorsecurity.cn/
+          target: 'https://console.tensorsecurity.cn/',
+          changeOrigin: true
+        }
+      }
+    }
   }
 })
